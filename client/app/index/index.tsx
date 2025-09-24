@@ -1,4 +1,5 @@
 import { AppShell, Title } from "@mantine/core"
+import Game from "~/components/Game"
 
 
 export const Index = () => {
@@ -12,6 +13,9 @@ export const Index = () => {
         <Title order={2}>EZ-Connecty</Title>
         <Title order={4}>Le système de jeu Connect4 FACILE à utiliser</Title>
       </AppShell.Header>
+      <AppShell.Main>
+        <Game />
+      </AppShell.Main>
     </AppShell>
   )
 }
