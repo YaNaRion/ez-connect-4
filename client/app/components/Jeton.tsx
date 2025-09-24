@@ -53,13 +53,19 @@ const Jeton = ({owner, lastCapture, name, coords}: JetonProps) => {
       </Menu.Item>
     ))
 
-  
 
   return (
     <Center >
       <Menu>
         <Menu.Target>
-          <Button radius={1000} h={150} w={150} size="lg"  variant="filled" color={owner?.color ?? "gray"}>
+          <Button 
+          radius={1000} 
+          fullWidth
+          mih={100}
+          size="compact-lg"  
+          variant="filled" 
+          color={owner?.color ?? "gray"}
+          >
             <Stack align="center" gap={2}>
 
               <Text fw={700}>
