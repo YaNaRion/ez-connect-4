@@ -24,8 +24,14 @@ export class EventsGateway {
   constructor(private readonly gameServer: GameStateService) {}
   @WebSocketServer()
   server: Server;
-  @SubscribeMessage('message')
+  // @SubscribeMessage('message')
+  // handleMessage(): string {
+  //   return 'Hello world!';
+  // }
+
+  @SubscribeMessage('connect')
   handleMessage(): string {
+    console.log('DANS CONNECT');
     return 'Hello world!';
   }
 
