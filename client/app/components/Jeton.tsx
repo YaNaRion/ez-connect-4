@@ -10,21 +10,21 @@ interface JetonProps extends JetonModel {
 }
 
 const Jeton = ({ owner, lastCapture, name, coords }: JetonProps) => {
-
   const equipes = useGameStore((state) => state.equipes)
   const clearClaim = useGameStore((state) => state.clearClaim)
   const claimCooldownMinutes = useGameStore((state) => state.claimCooldownMinutes)
-  const [remaining, setRemaining] = useState<number>(claimCooldownMinutes * 60);
-  const isOnCooldown = lastCapture && ((new Date().getTime() - lastCapture.getTime()) < (claimCooldownMinutes * 60 * 1000))
+  const [remaining, setRemaining] = useState<number>(0);
+  const { socket } = useSocket();
 
+  const isOnCooldown = lastCapture && ((new Date().getTime() - lastCapture.getTime()) < (claimCooldownMinutes * 60 * 1000))
   const remainingString = `${Math.floor(remaining / 60).toString().padStart(2, '0')}:${(remaining % 60).toString().padStart(2, '0')}`
 
-  const { socket } = useSocket();
+
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval>;
     if (lastCapture) {
-
+      setRemaining(Math.round((claimCooldownMinutes * 60 * 1000 - (new Date().getTime() - lastCapture.getTime())) / 1000))
       intervalId = setInterval(() => {
         setRemaining((prev) => {
           if (prev <= 1) {

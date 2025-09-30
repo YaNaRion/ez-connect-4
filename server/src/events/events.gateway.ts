@@ -17,6 +17,8 @@ export enum GameEvent {
   UPDATE_TILE = 'UpdateTile',
   UPDATE_TILE_ERR = 'UpdateTileErr',
   UPDATE_ALL_TIMER = 'UpdateAllTimer',
+  GET_GAME_STATE = 'GetGameState',
+  RESET_GAME = 'ResetGame',
 }
 
 const TeamScores: Record<string, TEAM> = {
@@ -40,6 +42,7 @@ interface DataTile {
   y: number;
   team: string;
   lastCapture?: string;
+  game_state?: GAME_STATE;
 }
 
 @WebSocketGateway({ cors: true })
@@ -49,10 +52,7 @@ export class EventsGateway {
   server: Server;
 
   handleConnection(socket: Socket) {
-    console.log('NOUVELLE CONNECTION');
-    console.log('DANS CONNECT, UPDATE ALL TILE AVANT IF');
     if (this.gameServer.gameState == GAME_STATE.InGame) {
-      console.log('DANS CONNECT, UPDATE ALL TILE');
       const dataGrid: DataTile[] = [];
       for (let i = 0; i < 5; ++i) {
         for (let j = 0; j < 5; ++j) {
@@ -61,8 +61,8 @@ export class EventsGateway {
             x: i,
             y: j,
             team: InverseTeamScores[tempData.currentTeam],
-            lastCapture:
-              this.gameServer.grid[i][j].lastTimeClaimed?.toISOString(),
+            lastCapture: tempData.lastTimeClaimed?.toISOString(),
+            game_state: this.gameServer.gameState,
           };
           dataGrid.push(dataOUT);
         }
@@ -70,6 +70,34 @@ export class EventsGateway {
 
       const dataOUT = {
         array: dataGrid,
+        game_state: this.gameServer.gameState,
+      };
+
+      socket.emit(GameEvent.UPDATE_ALL_TIMER, dataOUT);
+    }
+  }
+
+  @SubscribeMessage(GameEvent.UPDATE_ALL_TIMER)
+  handlerUpdateALl(socket: Socket) {
+    if (this.gameServer.gameState == GAME_STATE.InGame) {
+      const dataGrid: DataTile[] = [];
+      for (let i = 0; i < 5; ++i) {
+        for (let j = 0; j < 5; ++j) {
+          const tempData = this.gameServer.grid[i][j];
+          const dataOUT: DataTile = {
+            x: i,
+            y: j,
+            team: InverseTeamScores[tempData.currentTeam],
+            lastCapture: tempData.lastTimeClaimed?.toISOString(),
+            game_state: this.gameServer.gameState,
+          };
+          dataGrid.push(dataOUT);
+        }
+      }
+
+      const dataOUT = {
+        array: dataGrid,
+        game_state: this.gameServer.gameState,
       };
 
       socket.emit(GameEvent.UPDATE_ALL_TIMER, dataOUT);
@@ -79,20 +107,45 @@ export class EventsGateway {
   @SubscribeMessage(GameEvent.START_GAME)
   handleStartGame(): void {
     this.gameServer.StartGame();
-    this.server.emit(GameEvent.START_GAME);
+    this.server.emit(GameEvent.START_GAME, {
+      game_state: this.gameServer.gameState,
+    });
   }
 
   @SubscribeMessage(GameEvent.END_GAME)
   handleEndGame(): void {
-    this.gameServer.gameState = GAME_STATE.InGame;
+    this.gameServer.EndGame();
     this.server.emit(GameEvent.END_GAME);
   }
 
-  // Besoin body avec les coordonnees et lequipe de la tile qui change
+  @SubscribeMessage(GameEvent.RESET_GAME)
+  handleResetGame(): void {
+    this.gameServer.ResetGame();
+    const dataGrid: DataTile[] = [];
+    for (let i = 0; i < 5; ++i) {
+      for (let j = 0; j < 5; ++j) {
+        const tempData = this.gameServer.grid[i][j];
+        const dataOUT: DataTile = {
+          x: i,
+          y: j,
+          team: InverseTeamScores[tempData.currentTeam],
+          lastCapture: tempData.lastTimeClaimed?.toISOString(),
+          game_state: this.gameServer.gameState,
+        };
+        dataGrid.push(dataOUT);
+      }
+    }
+
+    const dataOUT = {
+      array: dataGrid,
+      game_state: this.gameServer.gameState,
+    };
+    this.server.emit(GameEvent.UPDATE_ALL_TIMER, dataOUT);
+    this.server.emit(GameEvent.RESET_GAME);
+  }
+
   @SubscribeMessage(GameEvent.UPDATE_TILE)
   handleUpdateTile(socket: Socket, dataIN: DataTile): void {
-    // Mettre les params de la requete
-    console.log('DANS CONNECT, UPDATE TILE');
     if (this.gameServer.gameState != GAME_STATE.InGame) {
       return;
     }
@@ -110,7 +163,6 @@ export class EventsGateway {
           this.gameServer.grid[x_index][y_index].lastTimeClaimed?.toISOString(),
       };
 
-      // Formater le data grid
       this.server.emit(GameEvent.UPDATE_TILE, dataOUT);
     } catch (error) {
       if (error instanceof Error) {
@@ -121,7 +173,4 @@ export class EventsGateway {
       }
     }
   }
-
-  // @SubscribeMessage(GameEvent.UPDATE_ALL_TIMER)
-  // handleUpdateAllTile(socket: Socket): void {};
 }

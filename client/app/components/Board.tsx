@@ -1,5 +1,4 @@
 import { Paper, SimpleGrid } from "@mantine/core"
-import type { BoardModel } from "~/state/models"
 import Jeton from "./Jeton"
 import useGameStore from "~/state/store"
 
@@ -12,7 +11,7 @@ const Board = () => {
       <SimpleGrid cols={board.length} spacing="xs">
         {board.map((row, rowIndex) => (
           row.map((jeton, colIndex) => (
-            <Jeton key={`${rowIndex}-${colIndex}`} {...jeton} coords={[rowIndex, colIndex]} />
+            <Jeton key={`${rowIndex}-${colIndex}`} {...jeton} lastCapture={jeton.lastCapture} coords={[rowIndex, colIndex]} />
           ))
         ))}
       </SimpleGrid>

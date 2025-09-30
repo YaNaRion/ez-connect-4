@@ -14,7 +14,7 @@ export enum TEAM {
   YELLOW,
 }
 
-const THIRTY_MINUTES_MS: number = 30 * 60 * 1000;
+const THIRTY_MINUTES_MS: number = 5 * 60 * 1000;
 const GRID_SIZE: number = 5;
 
 // Pour une game de deux heures
@@ -54,6 +54,10 @@ export class GameStateService {
   constructor() {
     this.gameState = GAME_STATE.Lobby;
     this.grid = [[]];
+    this.BuildGrid();
+  }
+
+  BuildGrid() {
     for (let i = 0; i < GRID_SIZE; ++i) {
       this.grid.push([]);
       for (let j = 0; j < GRID_SIZE; ++j) {
@@ -69,6 +73,12 @@ export class GameStateService {
 
   EndGame() {
     this.gameState = GAME_STATE.EndGame;
+  }
+
+  ResetGame() {
+    this.grid = [[]];
+    this.BuildGrid();
+    this.gameState = GAME_STATE.Lobby;
   }
 
   ChangeGameState(newGameState: GAME_STATE) {
