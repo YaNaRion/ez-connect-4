@@ -1,8 +1,9 @@
 import { Stack, Title } from "@mantine/core"
 import Board from "./Board"
-import type { Equipes } from "~/state/models"
-import { useEffect, useState } from "react"
-import { io } from "socket.io-client"
+import type { Coordinates, Equipes } from "~/state/models"
+import { useEffect } from "react"
+import useGameStore from "~/state/store"
+import { useSocket } from "~/provider/socket"
 
 
 const exampleEquipes: Equipes = {
@@ -16,40 +17,63 @@ const exampleBoardState = [
   [{ name: "C1" }, { name: "C2" }, { name: "C3" }],
 ]
 
-const serverURL = "http://localhost:3000";
-
+export enum GameEvent {
+  START_GAME = 'StartGame',
+  END_GAME = 'EndGame',
+  UPDATE_TILE = 'UpdateTile',
+  UPDATE_TILE_ERR = 'UpdateTileErr',
+  UPDATE_ALL_TIMER = 'UpdateAllTimer',
+}
 
 const Game = () => {
-  const [socket, setSocket] = useState(null);
-  const [isConnected, setIsConnected] = useState(false); // Savoir si on est connecté ou non
+  // const board = useGameStore((state) => state.board)
+  const { socket } = useSocket();
 
+  const reset = useGameStore((state) => state.reset)
+  const claim = useGameStore((state) => state.claim)
+  // const clearClaim = useGameStore((state) => state.clearClaim)
+
+  // setSocket(newSocket);
   useEffect(() => {
-    const newSocket = io(serverURL);
+    if (socket) {
 
-    setSocket(newSocket);
+      socket.on(GameEvent.END_GAME, () => {
+        reset();
+      });
 
-    newSocket.on("connect", () => {
-      console.log("CONNECTED");
-      setIsConnected(true);
-    });
+      socket.on(GameEvent.UPDATE_TILE, (data: any) => {
+        const coord: Coordinates = [data.x, data.y];
+        claim(coord, data.team, new Date(data.lastCapture));
+      });
 
-    newSocket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    return () => {
-      newSocket.disconnect();
-    };
+      socket.on(GameEvent.UPDATE_ALL_TIMER, (data: any) => {
+        for (let i = 0; i < 25; ++i) {
+          const coord: Coordinates = [data.array[i].x, data.array[i].y];
+          claim(coord, data.array[i].team, new Date(data.array[i].lastCapture));
+        }
+      });
+    }
   }, []);
 
-  // SocketContext est plus haut dans l'arbre que le reste de l'application. 
-  // L'application ne sera pas chargée tant que la connexion socket n'est pas établie.
-  if (!isConnected) return <div>Connecting to server...</div>;
+  const StartGameButton = () => {
+    if (socket) {
+      socket.emit(GameEvent.START_GAME);
+    }
+  };
+
+  const ResetGameButton = () => {
+    if (socket) {
+      socket.emit(GameEvent.END_GAME);
+    }
+  };
+
   return (
     <Stack>
       <Title order={2}>Grand jeu Connect4 Anims 2025</Title>
+      <button onClick={StartGameButton}> StartGameButton</button>
+      <button onClick={ResetGameButton}> ResetGameButton</button>
       <Board />
-    </Stack>
+    </Stack >
   )
 }
 

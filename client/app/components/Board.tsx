@@ -3,7 +3,6 @@ import type { BoardModel } from "~/state/models"
 import Jeton from "./Jeton"
 import useGameStore from "~/state/store"
 
-
 const Board = () => {
 
   const board = useGameStore((state) => state.board)

@@ -19,27 +19,67 @@ export enum GameEvent {
   UPDATE_ALL_TIMER = 'UpdateAllTimer',
 }
 
+const TeamScores: Record<string, TEAM> = {
+  NONE: TEAM.NONE,
+  rouges: TEAM.RED,
+  bleus: TEAM.BLUE,
+  verts: TEAM.GREEN,
+  jaunes: TEAM.YELLOW,
+};
+
+const InverseTeamScores: Record<TEAM, string> = {
+  [TEAM.NONE]: 'NONE',
+  [TEAM.RED]: 'rouges',
+  [TEAM.BLUE]: 'bleus',
+  [TEAM.GREEN]: 'verts',
+  [TEAM.YELLOW]: 'jaunes',
+};
+
+interface DataTile {
+  x: number;
+  y: number;
+  team: string;
+  lastCapture?: string;
+}
+
 @WebSocketGateway({ cors: true })
 export class EventsGateway {
   constructor(private readonly gameServer: GameStateService) {}
   @WebSocketServer()
   server: Server;
-  // @SubscribeMessage('message')
-  // handleMessage(): string {
-  //   return 'Hello world!';
-  // }
 
-  @SubscribeMessage('connect')
-  handleMessage(): string {
-    console.log('DANS CONNECT');
-    return 'Hello world!';
+  handleConnection(socket: Socket) {
+    console.log('NOUVELLE CONNECTION');
+    console.log('DANS CONNECT, UPDATE ALL TILE AVANT IF');
+    if (this.gameServer.gameState == GAME_STATE.InGame) {
+      console.log('DANS CONNECT, UPDATE ALL TILE');
+      const dataGrid: DataTile[] = [];
+      for (let i = 0; i < 5; ++i) {
+        for (let j = 0; j < 5; ++j) {
+          const tempData = this.gameServer.grid[i][j];
+          const dataOUT: DataTile = {
+            x: i,
+            y: j,
+            team: InverseTeamScores[tempData.currentTeam],
+            lastCapture:
+              this.gameServer.grid[i][j].lastTimeClaimed?.toISOString(),
+          };
+          dataGrid.push(dataOUT);
+        }
+      }
+
+      const dataOUT = {
+        array: dataGrid,
+      };
+
+      socket.emit(GameEvent.UPDATE_ALL_TIMER, dataOUT);
+    }
   }
 
   @SubscribeMessage(GameEvent.START_GAME)
   handleStartGame(): void {
-    this.gameServer.gameState = GAME_STATE.InGame;
     this.gameServer.StartGame();
-    this.server.emit('GameEvent.START_GAME');
+    this.server.emit(GameEvent.START_GAME);
   }
 
   @SubscribeMessage(GameEvent.END_GAME)
@@ -50,18 +90,28 @@ export class EventsGateway {
 
   // Besoin body avec les coordonnees et lequipe de la tile qui change
   @SubscribeMessage(GameEvent.UPDATE_TILE)
-  handleUpdateTile(socket: Socket /*@MessageBody data: Body*/): void {
+  handleUpdateTile(socket: Socket, dataIN: DataTile): void {
     // Mettre les params de la requete
-    const x_index = 0;
-    const y_index = 0;
-    const teamColor = TEAM.RED;
+    console.log('DANS CONNECT, UPDATE TILE');
+    if (this.gameServer.gameState != GAME_STATE.InGame) {
+      return;
+    }
+    const x_index: number = dataIN.x;
+    const y_index: number = dataIN.y;
+    const teamColor: string = dataIN.team;
 
     try {
-      this.gameServer.gameBoard.grid[x_index][y_index].ChangeTeam(teamColor);
-      const data = this.gameServer.gameBoard.grid[x_index][y_index];
+      this.gameServer.ChangeTileTeam(TeamScores[teamColor], x_index, y_index);
+      const dataOUT: DataTile = {
+        x: x_index,
+        y: y_index,
+        team: dataIN.team,
+        lastCapture:
+          this.gameServer.grid[x_index][y_index].lastTimeClaimed?.toISOString(),
+      };
 
       // Formater le data grid
-      this.server.emit(GameEvent.UPDATE_TILE, data);
+      this.server.emit(GameEvent.UPDATE_TILE, dataOUT);
     } catch (error) {
       if (error instanceof Error) {
         if (error.message == ERR_TILE_IS_PROTECTED) {
@@ -72,14 +122,6 @@ export class EventsGateway {
     }
   }
 
-  @SubscribeMessage(GameEvent.UPDATE_ALL_TIMER)
-  handleUpdateAllTile(/*@MessageBody data: Body*/): void {
-    const gameBoard = this.gameServer;
-    // Ajouter ce data brodcast:
-    // @Date de fin de tous les timer
-    // @Date de fin de la partie
-    // @Status de toutes les tiles
-    // @Status de la partie
-    this.server.emit(GameEvent.UPDATE_ALL_TIMER, gameBoard);
-  }
+  // @SubscribeMessage(GameEvent.UPDATE_ALL_TIMER)
+  // handleUpdateAllTile(socket: Socket): void {};
 }

@@ -1,4 +1,3 @@
-
 export type JetonState = "free" | "yellow" | "empty";
 export type Coordinates = [number, number];
 
@@ -14,10 +13,10 @@ export interface Equipes {
 export interface JetonModel {
   owner?: Equipe;
   lastCapture?: Date;
-  name: string
+  name: string;
 }
 
-export interface BoardModel{
+export interface BoardModel {
   board: JetonModel[][];
 }
 
@@ -26,3 +25,4 @@ export interface GameState {
   board: JetonModel[][];
   claimCooldownMinutes: number;
 }
+

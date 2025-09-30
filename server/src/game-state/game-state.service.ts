@@ -10,27 +10,32 @@ export enum TEAM {
   NONE,
   RED,
   BLUE,
-  GREED,
+  GREEN,
   YELLOW,
 }
 
 const THIRTY_MINUTES_MS: number = 30 * 60 * 1000;
+const GRID_SIZE: number = 5;
 
 // Pour une game de deux heures
-const GAME_DURATION_MS: number = THIRTY_MINUTES_MS * 4;
+export const GAME_DURATION_MS: number = THIRTY_MINUTES_MS * 4;
 export const ERR_TILE_IS_PROTECTED: string = 'The tile is protected';
 
 export class Tile {
   public currentTeam: TEAM;
   public isProtected: boolean;
-  public endTimer: Date;
+  public lastTimeClaimed?: Date;
 
-  constructor() {}
+  constructor() {
+    this.currentTeam = TEAM.NONE;
+    this.isProtected = false;
+  }
+
   ChangeTeam(newTeam: TEAM) {
-    if (this.isProtected) {
+    if (!this.isProtected) {
       this.currentTeam = newTeam;
       this.isProtected = true;
-      this.endTimer = new Date(Date.now() + THIRTY_MINUTES_MS);
+      this.lastTimeClaimed = new Date();
       setTimeout(() => {
         this.isProtected = false;
       }, THIRTY_MINUTES_MS);
@@ -40,26 +45,37 @@ export class Tile {
   }
 }
 
-export class GameBoard {
-  public grid: Tile[][];
-  public endTimer: Date;
-}
-
 @Injectable()
 export class GameStateService {
   gameState: GAME_STATE;
-  gameBoard: GameBoard;
+  public grid: Tile[][];
+  public endTimer: Date;
 
   constructor() {
     this.gameState = GAME_STATE.Lobby;
+    this.grid = [[]];
+    for (let i = 0; i < GRID_SIZE; ++i) {
+      this.grid.push([]);
+      for (let j = 0; j < GRID_SIZE; ++j) {
+        this.grid[i].push(new Tile());
+      }
+    }
   }
 
   StartGame() {
-    this.gameBoard.endTimer = new Date(Date.now() + GAME_DURATION_MS);
+    this.endTimer = new Date(Date.now() + GAME_DURATION_MS);
     this.gameState = GAME_STATE.InGame;
+  }
+
+  EndGame() {
+    this.gameState = GAME_STATE.EndGame;
   }
 
   ChangeGameState(newGameState: GAME_STATE) {
     this.gameState = newGameState;
+  }
+
+  ChangeTileTeam(newTeam: TEAM, x: number, y: number) {
+    this.grid[x][y].ChangeTeam(newTeam);
   }
 }
