@@ -62,6 +62,8 @@ const Game = () => {
       socket.on(GameEvent.UPDATE_TILE, (data: any) => {
         const coord: Coordinates = [data.x, data.y];
         claim(coord, data.team, new Date(data.lastCapture));
+        const alert_string = `L'équipe ${data.team} à prossession de la case (${coord[0] + 1}, ${coord[1] + 1})`
+        alert(alert_string);
       });
 
       socket.on(GameEvent.UPDATE_ALL_TIMER, (data: any) => {

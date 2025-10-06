@@ -20,7 +20,6 @@ const Jeton = ({ owner, lastCapture, name, coords }: JetonProps) => {
   const remainingString = `${Math.floor(remaining / 60).toString().padStart(2, '0')}:${(remaining % 60).toString().padStart(2, '0')}`
 
 
-
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval>;
     if (lastCapture) {
