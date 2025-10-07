@@ -25,4 +25,3 @@ export interface GameState {
   board: JetonModel[][];
   claimCooldownMinutes: number;
 }
-

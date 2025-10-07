@@ -7,9 +7,10 @@ import { GameEvent } from "./Game";
 
 interface JetonProps extends JetonModel {
   coords: [number, number];
+  isAdmin: boolean
 }
 
-const Jeton = ({ owner, lastCapture, name, coords }: JetonProps) => {
+const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
   const equipes = useGameStore((state) => state.equipes)
   const clearClaim = useGameStore((state) => state.clearClaim)
   const claimCooldownMinutes = useGameStore((state) => state.claimCooldownMinutes)
@@ -59,7 +60,12 @@ const Jeton = ({ owner, lastCapture, name, coords }: JetonProps) => {
         key={key}
         color={equipe.color}
         disabled={isOnCooldown}
-        onClick={() => handleClaim(key)}
+        onClick={() => {
+          if (isAdmin) {
+            handleClaim(key)
+          }
+        }
+        }
       >
         {equipe.name}
       </Menu.Item>
@@ -91,11 +97,14 @@ const Jeton = ({ owner, lastCapture, name, coords }: JetonProps) => {
             </Stack>
           </Button>
         </Menu.Target>
-        <Menu.Dropdown>
-          {menuEntries}
-          <Menu.Divider />
-          <Menu.Item color={"gray"} onClick={() => clearClaim(coords)}>Clear</Menu.Item>
-        </Menu.Dropdown>
+        {
+          (isAdmin && (
+            <Menu.Dropdown>
+              {menuEntries}
+              <Menu.Divider />
+              <Menu.Item color={"gray"} onClick={() => clearClaim(coords)}>Clear</Menu.Item>
+            </Menu.Dropdown>
+          ))}
       </Menu>
     </Center>
   )
