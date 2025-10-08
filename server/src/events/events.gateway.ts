@@ -19,6 +19,7 @@ export enum GameEvent {
   UPDATE_ALL_TIMER = 'UpdateAllTimer',
   GET_GAME_STATE = 'GetGameState',
   RESET_GAME = 'ResetGame',
+  CLEAR_CLAIM = 'ClearClaim',
 }
 
 const TeamScores: Record<string, TEAM> = {
@@ -159,6 +160,35 @@ export class EventsGateway {
         x: x_index,
         y: y_index,
         team: dataIN.team,
+        lastCapture:
+          this.gameServer.grid[x_index][y_index].lastTimeClaimed?.toISOString(),
+      };
+
+      this.server.emit(GameEvent.UPDATE_TILE, dataOUT);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message == ERR_TILE_IS_PROTECTED) {
+          console.log(error.message);
+          socket.emit(GameEvent.UPDATE_TILE_ERR, error.message);
+        }
+      }
+    }
+  }
+
+  @SubscribeMessage(GameEvent.CLEAR_CLAIM)
+  handleUpdateClearTile(socket: Socket, dataIN: DataTile): void {
+    if (this.gameServer.gameState != GAME_STATE.InGame) {
+      return;
+    }
+    const x_index: number = dataIN.x;
+    const y_index: number = dataIN.y;
+
+    try {
+      this.gameServer.ClearTileTeam(x_index, y_index);
+      const dataOUT: DataTile = {
+        x: x_index,
+        y: y_index,
+        team: TEAM.NONE,
         lastCapture:
           this.gameServer.grid[x_index][y_index].lastTimeClaimed?.toISOString(),
       };

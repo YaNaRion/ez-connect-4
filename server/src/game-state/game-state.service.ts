@@ -7,11 +7,11 @@ export enum GAME_STATE {
 }
 
 export enum TEAM {
-  NONE,
-  RED,
-  BLUE,
-  GREEN,
-  YELLOW,
+  NONE = 'None',
+  RED = 'red',
+  BLUE = 'blue',
+  GREEN = 'green',
+  YELLOW = 'yellow',
 }
 
 const THIRTY_MINUTES_MS: number = 5 * 60 * 1000;
@@ -25,6 +25,7 @@ export class Tile {
   public currentTeam: TEAM;
   public isProtected: boolean;
   public lastTimeClaimed?: Date;
+  public timerID: NodeJS.Timeout | undefined;
 
   constructor() {
     this.currentTeam = TEAM.NONE;
@@ -36,12 +37,19 @@ export class Tile {
       this.currentTeam = newTeam;
       this.isProtected = true;
       this.lastTimeClaimed = new Date();
-      setTimeout(() => {
+
+      this.timerID = setTimeout(() => {
         this.isProtected = false;
       }, THIRTY_MINUTES_MS);
     } else {
       throw new Error(ERR_TILE_IS_PROTECTED);
     }
+  }
+
+  ClearTile() {
+    clearTimeout(this.timerID);
+    this.isProtected = false;
+    this.currentTeam = TEAM.NONE;
   }
 }
 
@@ -87,5 +95,9 @@ export class GameStateService {
 
   ChangeTileTeam(newTeam: TEAM, x: number, y: number) {
     this.grid[x][y].ChangeTeam(newTeam);
+  }
+
+  ClearTileTeam(x: number, y: number) {
+    this.grid[x][y].ClearTile();
   }
 }

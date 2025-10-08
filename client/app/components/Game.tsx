@@ -25,6 +25,7 @@ export enum GameEvent {
   UPDATE_ALL_TIMER = 'UpdateAllTimer',
   GET_GAME_STATE = "GetGameState",
   RESET_GAME = 'ResetGame',
+  CLEAR_CLAIM = 'ClearClaim',
 }
 
 const adminPass = "leboss420"
@@ -49,8 +50,6 @@ const Game = () => {
   useEffect(() => {
     if (socket) {
       const mode = searchParams.get("mode");
-
-      console.log(mode)
       if (mode && mode === adminPass) {
         setIsAdmin(true)
       }
@@ -69,8 +68,8 @@ const Game = () => {
             setGameState(GAME_STATE.InGame);
           }
         });
-
       }
+
       socket.on(GameEvent.UPDATE_TILE, (data: any) => {
         const coord: Coordinates = [data.x, data.y];
         claim(coord, data.team, new Date(data.lastCapture));

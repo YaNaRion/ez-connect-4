@@ -102,7 +102,18 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
             <Menu.Dropdown>
               {menuEntries}
               <Menu.Divider />
-              <Menu.Item color={"gray"} onClick={() => clearClaim(coords)}>Clear</Menu.Item>
+              <Menu.Item color={"gray"} onClick={() => {
+                clearClaim(coords);
+                if (socket) {
+                  const data = {
+                    x: coords[0],
+                    y: coords[1],
+                    team: "None",
+                  };
+                  socket.emit(GameEvent.CLEAR_CLAIM, data);
+
+                }
+              }}>Clear</Menu.Item>
             </Menu.Dropdown>
           ))}
       </Menu>
