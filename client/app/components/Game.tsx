@@ -74,6 +74,7 @@ const Game = () => {
         const coord: Coordinates = [data.x, data.y];
         claim(coord, data.team, new Date(data.lastCapture));
         const alert_string = `L'équipe ${data.team} à prossession de la case (${coord[0] + 1}, ${coord[1] + 1})`
+        console.log("JUSETE AVANT ALERT")
         alert(alert_string);
       });
 
@@ -88,8 +89,15 @@ const Game = () => {
       });
 
       socket.emit(GameEvent.UPDATE_ALL_TIMER);
-
-    }
+      return () => {
+        socket.off(GameEvent.RESET_GAME);
+        socket.off(GameEvent.END_GAME);
+        socket.off(GameEvent.START_GAME);
+        socket.off(GameEvent.UPDATE_TILE);
+        socket.off(GameEvent.UPDATE_ALL_TIMER);
+        socket.off(GameEvent.START_GAME);
+      };
+    };
   }, []);
 
   const StartGameButton = () => {
