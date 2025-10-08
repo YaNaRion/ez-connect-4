@@ -14,7 +14,7 @@ export enum TEAM {
   YELLOW = 'yellow',
 }
 
-const THIRTY_MINUTES_MS: number = 5 * 60 * 1000;
+const THIRTY_MINUTES_MS: number = 30 * 60 * 1000;
 const GRID_SIZE: number = 5;
 
 // Pour une game de deux heures

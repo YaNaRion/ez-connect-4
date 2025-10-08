@@ -46,7 +46,7 @@ const defaultState: GameState = {
       { name: "E5" },
     ],
   ],
-  claimCooldownMinutes: 5,
+  claimCooldownMinutes: 30,
 };
 
 const useGameStore = create(
