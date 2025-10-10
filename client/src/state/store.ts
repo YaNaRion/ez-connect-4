@@ -55,7 +55,6 @@ const useGameStore = create(
     claim: (coords: Coordinates, equipeKey: string, lastCapture: Date) =>
       set((state) => {
         if (equipeKey in state.equipes) {
-          console.log("DANS IF EQUIPE");
           const newBoard = state.board.map((row) =>
             row.map((jeton) => ({ ...jeton })),
           );
@@ -64,6 +63,16 @@ const useGameStore = create(
           newBoard[row][col].lastCapture = lastCapture;
           return { board: newBoard };
         } else return { board: state.board };
+      }),
+    resetATile: (coords: Coordinates) =>
+      set((state) => {
+        const newBoard = state.board.map((row) =>
+          row.map((jeton) => ({ ...jeton })),
+        );
+        const [row, col] = coords;
+        newBoard[row][col].owner = undefined;
+        newBoard[row][col].lastCapture = undefined;
+        return { board: newBoard };
       }),
     clearClaim: (coords: Coordinates) =>
       set((state) => {
