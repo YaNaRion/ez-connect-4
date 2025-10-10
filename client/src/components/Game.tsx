@@ -1,7 +1,7 @@
 import { Stack, Title } from "@mantine/core"
 import Board from "./Board"
 import type { Coordinates } from "../state/models"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import useGameStore from "../state/store"
 import { useSocket } from "../provider/socket"
 
@@ -31,6 +31,7 @@ const Game = () => {
   const reset = useGameStore((state) => state.reset)
   const resetATile = useGameStore((state) => state.resetATile)
   const claim = useGameStore((state) => state.claim)
+  const board = useGameStore((state) => state.board)
   const notifPermission = useGameStore((state) => state.permissionsAllowed)
   const [gameState, setGameState] = useState<GAME_STATE>(GAME_STATE.Lobby);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -62,15 +63,16 @@ const Game = () => {
 
       socket.on(GameEvent.UPDATE_TILE, (data: any) => {
         const coord: Coordinates = [data.x, data.y];
+        const tuile = board[coord[0]][coord[1]];
         if (data.team === "None") {
           resetATile(coord);
-          if(notifPermission){
-            new Notification('Tuile perdue', {body: `La tuile ${data.name} est maintenant à personne`,  silent: false});
+          if(notifPermission && !isAdmin){
+            new Notification('Tuile perdue', {body: `La tuile ${tuile.name} est maintenant à personne`,  silent: false});
           }
         } else {
           claim(coord, data.team, new Date(data.lastCapture));
-          if(notifPermission){
-            new Notification('Tuile capturée', {body: `La tuile ${data.name} a été prise par + ${data.team_name}`, silent: false });
+          if(notifPermission && !isAdmin){
+            new Notification('Tuile capturée', {body: `La tuile ${tuile.name} a été prise par les ${data.team}`, silent: false });
           }
         }
       });
