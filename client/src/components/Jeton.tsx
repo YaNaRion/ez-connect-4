@@ -2,7 +2,7 @@ import { Button, Center, Menu, Stack, Text } from "@mantine/core"
 import { type JetonModel } from "../state/models"
 import useGameStore from "../state/store"
 import { useEffect, useState } from "react";
-import { useSocket } from "~/provider/socket";
+import { useSocket } from "../provider/socket";
 import { GameEvent } from "./Game";
 
 interface JetonProps extends JetonModel {
