@@ -1,10 +1,9 @@
 import { Stack, Title } from "@mantine/core"
 import Board from "./Board"
-import type { Coordinates, Equipes } from "../state/models"
+import type { Coordinates } from "../state/models"
 import { useEffect, useState } from "react"
 import useGameStore from "../state/store"
 import { useSocket } from "../provider/socket"
-import { useSearchParams } from "react-router-dom";
 
 
 export enum GameEvent {
@@ -26,7 +25,6 @@ export enum GAME_STATE {
   EndGame = 'La partie est finit',
 }
 
-
 const Game = () => {
   const { socket } = useSocket();
 
@@ -35,11 +33,11 @@ const Game = () => {
   const [gameState, setGameState] = useState<GAME_STATE>(GAME_STATE.Lobby);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  const [searchParams] = useSearchParams();
+  const urlParams = new URLSearchParams(window.location.search);
 
   useEffect(() => {
     if (socket) {
-      const mode = searchParams.get("mode");
+      const mode = urlParams.get("mode");
       if (mode && mode === adminPass) {
         setIsAdmin(true)
       }
