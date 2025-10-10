@@ -14,14 +14,16 @@ export enum GameEvent {
   UPDATE_ALL_TIMER = 'UpdateAllTimer',
   GET_GAME_STATE = "GetGameState",
   RESET_GAME = 'ResetGame',
+  CLEAR_CLAIM = 'ClearClaim',
 }
+
+const adminPass = "leboss420"
 
 export enum GAME_STATE {
   Lobby = 'La partie est en attente de commencer',
   InGame = 'La partie est commencée',
   EndGame = 'La partie est finit',
 }
-
 const Game = () => {
   const { socket } = useSocket();
 

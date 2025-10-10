@@ -1,7 +1,6 @@
 // src/contexts/SocketContext.tsx
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { GameEvent } from '~/components/Game';
 
 // Define types for the context
 interface SocketContextType {
@@ -33,7 +32,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [transport, setTransport] = useState<string>("N/A");
 
   useEffect(() => {
-    const socketUrl = process.env.NODE_ENV === 'production'
+    const socketUrl = import.meta.env.MODE === 'production'
       ? window.location.origin
       : 'http://localhost:3000';
 
