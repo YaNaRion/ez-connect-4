@@ -10,7 +10,7 @@ interface JetonProps extends JetonModel {
   isAdmin: boolean
 }
 
-const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
+const Jeton = ({ owner, lastCapture, name, coords, isAdmin, defi }: JetonProps) => {
   const equipes = useGameStore((state) => state.equipes)
   const clearClaim = useGameStore((state) => state.clearClaim)
   const claimCooldownMinutes = useGameStore((state) => state.claimCooldownMinutes)
@@ -97,7 +97,7 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
             </Stack>
           </Button>
         </Menu.Target>
-          <Menu.Dropdown>
+          <Menu.Dropdown maw="150px">
             {isAdmin ? (
               <>
               {menuEntries}
@@ -116,7 +116,15 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
               }}>Clear</Menu.Item>
               </>)
           :
+          <>
           <Menu.Item>{name}</Menu.Item>
+          <Menu.Item>
+            <Text size="xs">
+              {defi}
+
+            </Text>
+          </Menu.Item>
+          </>
           }
             </Menu.Dropdown>
         

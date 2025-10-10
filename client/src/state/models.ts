@@ -14,6 +14,7 @@ export interface JetonModel {
   owner?: Equipe;
   lastCapture?: Date;
   name: string;
+  defi: string;
 }
 
 export interface BoardModel {
