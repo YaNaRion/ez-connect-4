@@ -21,7 +21,7 @@ const defaultState: GameState = {
       { name: "Centre des sciences", defi:"Prendre une photo avec toutes léquipe sur les boules rouges" },
       { name: "CHUM", defi:"Prendre une photo ou on voit le logo du CHUM" },
       { name: "Éva B", defi:"Prendre une photo de ce qu’il y a au balcon en haut" },
-      { name: "McGill U.", defi:"" },
+      { name: "McGill U.", defi:"Prendre une photo en panorama dans les arches" },
       { name: "Henri-Dunant Gym", defi:"Prendre une photo de vous qui faites du sport" },
     ],
     [
