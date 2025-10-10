@@ -24,4 +24,5 @@ export interface GameState {
   equipes: Equipes;
   board: JetonModel[][];
   claimCooldownMinutes: number;
+  permissionsAllowed: boolean;
 }

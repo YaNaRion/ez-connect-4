@@ -79,13 +79,14 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
           <Button
             radius={1000}
             fullWidth
-            mih={100}
+            mih={70}
             size="compact-lg"
             variant="filled"
             color={owner?.color ?? "gray"}
+            px={5}
           >
-            <Stack align="center" gap={2}>
-              <Text fw={700}>
+            <Stack align="stretch" gap={2} w="100%">
+              <Text fw={700} size="xs" truncate="end" maw={100}>
                 {name}
               </Text>
               {isOnCooldown &&
@@ -96,9 +97,9 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
             </Stack>
           </Button>
         </Menu.Target>
-        {
-          (isAdmin && (
-            <Menu.Dropdown>
+          <Menu.Dropdown>
+            {isAdmin ? (
+              <>
               {menuEntries}
               <Menu.Divider />
               <Menu.Item color={"gray"} onClick={() => {
@@ -113,8 +114,12 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
 
                 }
               }}>Clear</Menu.Item>
+              </>)
+          :
+          <Menu.Item>{name}</Menu.Item>
+          }
             </Menu.Dropdown>
-          ))}
+        
       </Menu>
     </Center>
   )

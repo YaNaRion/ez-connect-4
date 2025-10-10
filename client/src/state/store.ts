@@ -13,7 +13,7 @@ const defaultState: GameState = {
     [
       { name: "Marché Atwater" },
       { name: "Anneau" },
-      { name: "Bas. Notre-Dame" },
+      { name: "Basilique Notre-Dame" },
       { name: "Canal Lachine" },
       { name: "Le Central" },
     ],
@@ -33,7 +33,7 @@ const defaultState: GameState = {
     ],
     [
       { name: "Grande Bilbio" },
-      { name: "Musée des B.-A." },
+      { name: "Musée des Beaux-Arts" },
       { name: "Palais des congrès" },
       { name: "Pointe-à-Callières" },
       { name: "Quartier Chinois" },
@@ -47,6 +47,7 @@ const defaultState: GameState = {
     ],
   ],
   claimCooldownMinutes: 30,
+  permissionsAllowed: false
 };
 
 const useGameStore = create(
@@ -82,6 +83,7 @@ const useGameStore = create(
         newBoard[row][col].lastCapture = undefined;
         return { board: newBoard };
       }),
+    setPermissionsAllowed: (allowed: boolean) => set(() => ({ permissionsAllowed: allowed })),
   })),
 );
 

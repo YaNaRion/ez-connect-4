@@ -1,8 +1,24 @@
 import { AppShell, Title } from "@mantine/core"
 import { SocketProvider } from "./provider/socket"
 import Game from "./components/Game"
+import { useEffect } from "react"
+import useGameStore from "./state/store"
 
 function App() {
+  
+  const setNotificationsPerm = useGameStore((state) => state.setPermissionsAllowed)
+
+  useEffect(() => {
+    if("Notification" in window){
+      Notification.requestPermission().then((permission) => {
+        if(permission === "granted"){
+          setNotificationsPerm(true);
+        } else {
+          setNotificationsPerm(false);
+        }
+    })
+  }
+  }, [])
 
   return (
     <AppShell

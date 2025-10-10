@@ -31,6 +31,7 @@ const Game = () => {
   const reset = useGameStore((state) => state.reset)
   const resetATile = useGameStore((state) => state.resetATile)
   const claim = useGameStore((state) => state.claim)
+  const notifPermission = useGameStore((state) => state.permissionsAllowed)
   const [gameState, setGameState] = useState<GAME_STATE>(GAME_STATE.Lobby);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
@@ -63,8 +64,14 @@ const Game = () => {
         const coord: Coordinates = [data.x, data.y];
         if (data.team === "None") {
           resetATile(coord);
+          if(notifPermission){
+            new Notification('Tuile perdue', {body: `La tuile ${data.name} est maintenant à personne`,  silent: false});
+          }
         } else {
           claim(coord, data.team, new Date(data.lastCapture));
+          if(notifPermission){
+            new Notification('Tuile capturée', {body: `La tuile ${data.name} a été prise par + ${data.team_name}`, silent: false });
+          }
         }
       });
 
