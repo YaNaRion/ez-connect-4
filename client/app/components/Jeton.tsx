@@ -85,7 +85,6 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
             color={owner?.color ?? "gray"}
           >
             <Stack align="center" gap={2}>
-
               <Text fw={700}>
                 {name}
               </Text>
