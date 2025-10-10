@@ -17,8 +17,6 @@ export enum GameEvent {
   CLEAR_CLAIM = 'ClearClaim',
 }
 
-const adminPass = "leboss420"
-
 export enum GAME_STATE {
   Lobby = 'La partie est en attente de commencer',
   InGame = 'La partie est commencée',

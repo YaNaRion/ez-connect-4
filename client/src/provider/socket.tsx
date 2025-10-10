@@ -33,13 +33,15 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const socketUrl = import.meta.env.MODE === 'production'
-      ? window.location.origin
+      ? window.location.origin+"/api"
       : 'http://localhost:3000';
 
     const newSocket = io(socketUrl, {
       autoConnect: true,
       transports: ['websocket', 'polling']
     });
+
+    console.log("Attempting to connect to socket at:", socketUrl);
 
     setSocket(newSocket);
 
