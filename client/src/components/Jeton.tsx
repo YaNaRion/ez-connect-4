@@ -1,5 +1,5 @@
-import { Box, Button, Center, Menu, Stack, Text } from "@mantine/core"
-import { type JetonModel } from "~/state/models"
+import { Button, Center, Menu, Stack, Text } from "@mantine/core"
+import { type JetonModel } from "../state/models"
 import useGameStore from "../state/store"
 import { useEffect, useState } from "react";
 import { useSocket } from "~/provider/socket";
@@ -85,7 +85,6 @@ const Jeton = ({ owner, lastCapture, name, coords, isAdmin }: JetonProps) => {
             color={owner?.color ?? "gray"}
           >
             <Stack align="center" gap={2}>
-
               <Text fw={700}>
                 {name}
               </Text>

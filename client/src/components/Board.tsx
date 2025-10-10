@@ -1,6 +1,6 @@
 import { Paper, SimpleGrid } from "@mantine/core"
 import Jeton from "./Jeton"
-import useGameStore from "~/state/store"
+import useGameStore from "../state/store"
 
 type BoardProps = {
   isAdmin?: boolean; // optional if not always passed
