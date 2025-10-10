@@ -33,7 +33,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const socketUrl = import.meta.env.MODE === 'production'
-      ? window.location.origin+"/api"
+      ? window.location.origin
       : 'http://localhost:3000';
 
     const newSocket = io(socketUrl, {
