@@ -1,7 +1,7 @@
 import { Stack, Title } from "@mantine/core"
 import Board from "./Board"
 import type { Coordinates } from "../state/models"
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import useGameStore from "../state/store"
 import { useSocket } from "../provider/socket"
 
